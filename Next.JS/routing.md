@@ -20,9 +20,8 @@
 
 # Defining Routes
 
-[사진]
-
 - 경로 생성 후 page 파일에 UI를 작성한다.
+  <img src='./img/DefiningRoutes.png' width='300'>
 
 # Pages & Layout
 
@@ -140,5 +139,168 @@ return (
 <NavigationEventsImplementation />
 </Suspense>
 );
+}
+```
+
+# Route Groups
+
+- URL 구조 없이 조직 라우트를 만들 수 있다.
+- 특별한 layout route segments opting-in 할 수 있다.
+- 멀티 layout을 생성 할 수 있다.
+
+## Convention
+
+- (folderName)으로 생성한다.
+
+## Good to know
+
+- URL 경로에 영향이 가지 않게 특별한 다른 이름을 가져야한다
+- 그룹 내부에 같은 URL 경로 설정 불가((a)/about/page.js 와 (b)/about/page.js 같은 경우)
+- 그룹 이동시 layout의 전체 페이지 렌더가 일어난다.
+
+# Dynamic Routes
+
+- 미리 랜더링 되어야 할때, 정확한 세그먼트 이름을 알지 못할때 동적 데이터로 경로 생성시 이용한다.
+
+## Convention
+
+- [folderName]으로 생성한다.
+- params를 통해 props 된다.
+
+## Example
+
+```
+export default function Page({ params }) {
+  return <div>My Post</div>;
+}
+```
+
+## Generating Static Params
+
+- 빌드시 정적으로 경로 생성되게 합니다.
+
+```
+export async function generateStaticParams() {
+  const posts = await fetch('https://.../posts').then((res) => res.json());
+
+  return posts.map((post) => ({
+    slug: post.slug,
+  }));
+}
+```
+
+## Catch-all Segment
+
+- 동적 세그먼트는 순차적인 세그먼트 확장이 가능하다.
+- [...folderName]
+- app/shop/[...slug]/page.js -> /shop/a/b/c -> { slug: ['a', 'b', 'c'] }
+
+## Optional Catch-all Segments
+
+- optional 하게 parameter를 포함한다.
+- [[...folderName]]
+- app/shop/[[...slug]]/page.js -> /shop/a/b/c -> { slug: ['a', 'b', 'c'] }
+
+## TypeScript Dynamic Routes
+
+```
+export default function Page({ params }: { params: { slug: string } }) {
+  return <h1>My Page</h1>;
+}
+```
+
+# Loading UI and Streaming
+
+- skeleton이나 spinners를 통해 만들어지며 웹에서의 반응으로 사용자 경험 UX를 이끈다.
+- component별로 loading창을 띄울 수 있다.
+
+## Convention
+
+- 폴더내의 loading.js 파일 생성
+
+## example
+
+```
+import { Suspense } from 'react';
+import { PostFeed, Weather } from './Components';
+
+export default function Posts() {
+  return (
+    <section>
+      <Suspense fallback={<p>Loading feed...</p>}>
+        <PostFeed />
+      </Suspense>
+      <Suspense fallback={<p>Loading weather...</p>}>
+        <Weather />
+      </Suspense>
+    </section>
+  );
+}
+```
+
+# Error Handling
+
+- React Error 경계에서 Automatically 라우트 중첩 자식을 자동 매칭한다.
+- 특정 오류에 맞는 UI 적용 가능
+- 전체 페이지 리로딩 하지않고 복구 시도하는 기능이 가능하다.
+- 오류 발생 부분만 오류가 생기고 나머지 기능은 사용가능하다.
+
+## Convention
+
+- 폴더내의 error.js 파일 생성
+
+```
+'use client'; // Error components must be Client Components
+
+import { useEffect } from 'react';
+
+export default function Error({
+  error,
+  reset,
+}: {
+  error: Error;
+  reset: () => void;
+}) {
+  useEffect(() => {
+    // Log the error to an error reporting service
+    console.error(error);
+  }, [error]);
+
+  return (
+    <div>
+      <h2>Something went wrong!</h2>
+      <button
+        onClick={
+          // Attempt to recover by trying to re-render the segment
+          () => reset()
+        }
+      >
+        Try again
+      </button>
+    </div>
+  );
+}
+```
+
+## Global-error
+
+```
+'use client';
+
+export default function GlobalError({
+  error,
+  reset,
+}: {
+  error: Error;
+  reset: () => void;
+}) {
+  return (
+    <html>
+      <body>
+        <h2>Something went wrong!</h2>
+        <button onClick={() => reset()}>Try again</button>
+      </body>
+    </html>
+  );
 }
 ```

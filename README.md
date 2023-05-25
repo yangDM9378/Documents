@@ -3,3 +3,4 @@
 
 ## Next.JS
 - #1 23/05/24 Next.JS routing.md Pages&Layout
+- #2 23/05/25 Next.Js routing.md ~Error Handling

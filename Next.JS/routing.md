@@ -21,7 +21,9 @@
 # Defining Routes
 
 - 경로 생성 후 page 파일에 UI를 작성한다.
+<div>
   <img src='./img/DefiningRoutes.png' width='300'>
+</div>
 
 # Pages & Layout
 
@@ -303,4 +305,321 @@ export default function GlobalError({
     </html>
   );
 }
+```
+
+# Parallel Routes
+
+- 같은 레이아웃에서 하나 또는 더 많은 동시적이거나 조건부적인 렌더를 할 수 있다.
+- 복잡한 라우팅 패턴을 향상시켜 사용할 수 있다.
+- 독립적인 에러나 로딩 처리가 가능하다.
+- 같은 URL에서 조건부에 다른 렌더를 진행 할 수 있다.
+<div>
+<img src='./img/ParallelRoutes.png' width='300'>
+</div>
+
+## Convention
+
+- @folder명 형태로 만든다
+- app 내부에 @analytics폴더와 @team 폴더가 있다고 가정한 예시이다.
+
+```
+# app/layout.tsx
+
+export default function Layout(props: {
+  children: React.ReactNode;
+  analytics: React.ReactNode;
+  team: React.ReactNode;
+}) {
+  return (
+    <>
+      {props.children}
+      {props.team}
+      {props.analytics}
+    </>
+  );
+}
+```
+
+## Unmatched Routes
+
+- 현재 URL에 내용없는 랜더가 진행될때 default를 가진다.
+
+### default.js
+
+- defalult.js가 없다면 404페이지로 나타난다.
+
+### useSelectedLayoutSegment(s)
+
+- useSelectedLayoutSegment와 useSelectedLayoutSegments 둘다 parallelRoutesKey를 가진다.
+- 예를 들어, URL 경로가 @authModal/login 또는 /login 일 때 loginSegments는 login을 가진다.
+
+```
+'use client';
+import { useSelectedLayoutSegment } from 'next/navigation';
+
+export default async function Layout(props: {
+  //...
+  authModal: React.ReactNode;
+}) {
+  const loginSegments = useSelectedLayoutSegment('authModal');
+  // ...
+}
+```
+
+## Parallel Routes 예시
+
+- Modal
+- 조건부 라우트
+
+# Intercepting Routes
+
+- 현재 페이지의 내용 정보를 가지고 다른 라우트를 보여준다.
+- 새로고침이나 공유된 페이지 이동시 intercept가 일어나면 안된다.
+<div>
+  <img src='./img/InterceptingRoutes.png' width='300'>
+</div>
+
+## Convention
+
+- (..)으로 생성한다.
+- (.) 같은 레벨
+- (..) 한 레벨 앞
+- (..)(..) 두레벨 앞
+- (...) 루트 app 디렉토리
+- 예로는 모달이 있다.
+<div>
+  <img src='./img/modal.png' width='300'>
+</div>
+
+# Route Handlers
+
+- 웹 request와 response API사용시 주는 custom request handelr를 만든다.
+
+## Convention
+
+- app 폴더내의 api 폴더안에 route.js로 생성한다
+
+```
+export async function GET(request: Request) {}
+```
+
+## Behavior
+
+### Static Route Handlers
+
+- get method 예시이다.
+
+```
+import { NextResponse } from 'next/server';
+
+export async function GET() {
+  const res = await fetch('https://data.mongodb-api.com/...', {
+    headers: {
+      'Content-Type': 'application/json',
+      'API-Key': process.env.DATA_API_KEY,
+    },
+  });
+  const data = await res.json();
+
+  return NextResponse.json({ data });
+}
+```
+
+### Dynamic Route Handlers
+
+- Get method와 함께 Request 사용할때
+- HTTP메서드를 사용할때
+- 쿠키 및 헤더와 같은 동적 기능 사용하때
+- 세그먼트 구성 옵션으로 동적 모드를 수동으로 지정할때
+
+```
+# GET method 예시
+
+import { NextResponse } from 'next/server';
+
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get('id');
+  const res = await fetch(`https://data.mongodb-api.com/product/${id}`, {
+    headers: {
+      'Content-Type': 'application/json',
+      'API-Key': process.env.DATA_API_KEY,
+    },
+  });
+  const product = await res.json();
+
+  return NextResponse.json({ product });
+}
+```
+
+### Route Resolution(경로확인)
+
+- 클라이언트 탐색에 참여하지 않는다
+- page.js와 같은 경로에 존재하면 안된다.
+
+```
+export default function Page() {
+  return <h1>Hello, Next.js!</h1>;
+}
+
+// ❌ Conflict
+// `app/route.js`
+export async function POST(request) {}
+```
+
+## 예시
+
+### 정적데이터 재검증
+
+- next.revalidate 옵션으로 재검증 가능하다.
+
+```
+import { NextResponse } from 'next/server';
+
+export async function GET() {
+  const res = await fetch('https://data.mongodb-api.com/...', {
+    next: { revalidate: 60 }, // Revalidate every 60 seconds
+  });
+  const data = await res.json();
+
+  return NextResponse.json(data);
+}
+```
+
+- config 옵션으로 사용가능하다.
+
+### 동적 함수
+
+- cookies와 headers에 담긴 것을 사용할 수 있다.
+- cookies
+
+```
+import { cookies } from 'next/headers';
+
+export async function GET(request: Request) {
+  const cookieStore = cookies();
+  const token = cookieStore.get('token');
+
+  return new Response('Hello, Next.js!', {
+    status: 200,
+    headers: { 'Set-Cookie': `token=${token}` },
+  });
+}
+```
+
+- Headers
+
+```
+import { headers } from 'next/headers';
+
+export async function GET(request: Request) {
+  const headersList = headers();
+  const referer = headersList.get('referer');
+
+  return new Response('Hello, Next.js!', {
+    status: 200,
+    headers: { referer: referer },
+  });
+}
+```
+
+### Redirects
+
+```
+import { redirect } from 'next/navigation';
+
+export async function GET(request: Request) {
+  redirect('https://nextjs.org/');
+}
+```
+
+### Dynamic Route Segments
+
+```
+export async function GET(
+  request: Request,
+  {
+    params,
+  }: {
+    params: { slug: string };
+  },
+) {
+  const slug = params.slug; // 'a', 'b', or 'c'
+}
+```
+
+### Streaming
+
+```
+// https://developer.mozilla.org/en-US/docs/Web/API/ReadableStream#convert_async_iterator_to_stream
+function iteratorToStream(iterator: any) {
+  return new ReadableStream({
+    async pull(controller) {
+      const { value, done } = await iterator.next();
+
+      if (done) {
+        controller.close();
+      } else {
+        controller.enqueue(value);
+      }
+    },
+  });
+}
+
+function sleep(time: number) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, time);
+  });
+}
+
+const encoder = new TextEncoder();
+
+async function* makeIterator() {
+  yield encoder.encode('<p>One</p>');
+  await sleep(200);
+  yield encoder.encode('<p>Two</p>');
+  await sleep(200);
+  yield encoder.encode('<p>Three</p>');
+}
+
+export async function GET() {
+  const iterator = makeIterator();
+  const stream = iteratorToStream(iterator);
+
+  return new Response(stream);
+}
+```
+
+### Request Body
+
+```
+import { NextResponse } from 'next/server';
+
+export async function POST(request: Request) {
+  const res = await request.json();
+  return NextResponse.json({ res });
+}
+```
+
+### CORS
+
+```
+export async function GET(request: Request) {
+  return new Response('Hello, Next.js!', {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  });
+}
+```
+
+### Edge and Node.js Runtimes
+
+- 원할하게 Edge Node.js 런타임을 진행 될 수 있게 한다.
+
+```
+export const runtime = 'edge'; // 'nodejs' is the default
 ```

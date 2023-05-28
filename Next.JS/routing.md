@@ -623,3 +623,317 @@ export async function GET(request: Request) {
 ```
 export const runtime = 'edge'; // 'nodejs' is the default
 ```
+
+# Middleware
+
+- request가 완료되기 전에 허락하는 것이다.
+- request 또는 response 해더를 rewriting, redirecting, modifying 함으로써 즉각적 반응하여 수정할 수 있다.
+- 미들웨어는 내용이 캐쉬 되고 routes가 맞을때 작동한다.
+
+## Convention
+
+- root폴더에 meddleware.ts(or js)를 사용한다.
+
+```
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+
+// This function can be marked `async` if using `await` inside
+export function middleware(request: NextRequest) {
+  return NextResponse.redirect(new URL('/home', request.url));
+}
+
+// See "Matching Paths" below to learn more
+export const config = {
+  matcher: '/about/:path*',
+};
+```
+
+## Matching Paths
+
+- 미들웨어는 모든 프로젝트 route를 위해 호출한다.
+
+1. headers from next.config.js
+2. redirects from next.config.js
+3. Middleware(rewrites, redirects, etc)
+4. beforeFiles(rewrites) from next.config.js
+5. Filesystem routes (public/, \_next/static/, pages/, app/, etc)
+6. afterFiles(rewrites\_ from next.config.js
+7. DynamicRoutes(/blog/[slug])
+8. fallback(rewrites) from next.config.js
+
+### Matcher
+
+- 특별한 경로의 미들웨어에 filter 허락한다.
+
+```
+export const config = {
+  matcher: '/about/:path*',
+};
+
+export const config = {
+  matcher: ['/about/:path*', '/dashboard/:path*'],
+};
+```
+
+- Configure
+
+1. /로 시작해야한다
+2. path name의 파라메타를 포함해야한다./about/:path는 /about/a와 같지만 /about/a/b는 같지 않음
+3. 경로의 모든 dynamic 주소를 포함하기 위해서는 /about/:path\*로 사용해야함
+4. 정규식 사용가능 /about/(.\*)
+
+### Conditional Statements
+
+```
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+
+export function middleware(request: NextRequest) {
+  if (request.nextUrl.pathname.startsWith('/about')) {
+    return NextResponse.rewrite(new URL('/about-2', request.url));
+  }
+
+  if (request.nextUrl.pathname.startsWith('/dashboard')) {
+    return NextResponse.rewrite(new URL('/dashboard/user', request.url));
+  }
+}
+```
+
+## NextResponse
+
+- 들어오는 요청을 다른 URL로 보내기
+- 주어진 URL로 다시 작성
+- API Routes 새로운 header 작성
+- cookies 반응
+- header 반응
+
+## Using Cookies
+
+- request 시 cookie header에 저장한다.
+- NextRequest와 NextResponse의 쿠키 확장을 통해 쿠키에 엑세스하고 조장하는 방법 제공한다.
+
+```
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+
+export function middleware(request: NextRequest) {
+  // Assume a "Cookie:nextjs=fast" header to be present on the incoming request
+  // Getting cookies from the request using the `RequestCookies` API
+  let cookie = request.cookies.get('nextjs')?.value;
+  console.log(cookie); // => 'fast'
+  const allCookies = request.cookies.getAll();
+  console.log(allCookies); // => [{ name: 'nextjs', value: 'fast' }]
+
+  request.cookies.has('nextjs'); // => true
+  request.cookies.delete('nextjs');
+  request.cookies.has('nextjs'); // => false
+
+  // Setting cookies on the response using the `ResponseCookies` API
+  const response = NextResponse.next();
+  response.cookies.set('vercel', 'fast');
+  response.cookies.set({
+    name: 'vercel',
+    value: 'fast',
+    path: '/test',
+  });
+  cookie = response.cookies.get('vercel');
+  console.log(cookie); // => { name: 'vercel', value: 'fast', Path: '/test' }
+  // The outgoing response will have a `Set-Cookie:vercel=fast;path=/test` header.
+
+  return response;
+}
+```
+
+## Setting Headers
+
+- NextResponse API사용 request와 response 헤더 세팅 할 수 있다.
+
+```
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+
+export function middleware(request: NextRequest) {
+  // Clone the request headers and set a new header `x-hello-from-middleware1`
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set('x-hello-from-middleware1', 'hello');
+
+  // You can also set request headers in NextResponse.rewrite
+  const response = NextResponse.next({
+    request: {
+      // New request headers
+      headers: requestHeaders,
+    },
+  });
+
+  // Set a new response header `x-hello-from-middleware2`
+  response.headers.set('x-hello-from-middleware2', 'hello');
+  return response;
+}
+```
+
+## Producing a Response
+
+- Response 또는 NextResponse 인스턴스를 반환하여 미들웨어에서 직접 응답 가능하다.
+
+```
+import { NextRequest, NextResponse } from 'next/server';
+import { isAuthenticated } from '@lib/auth';
+
+// Limit the middleware to paths starting with `/api/`
+export const config = {
+  matcher: '/api/:function*',
+};
+
+export function middleware(request: NextRequest) {
+  // Call our authentication function to check the request
+  if (!isAuthenticated(request)) {
+    // Respond with JSON indicating an error message
+    return new NextResponse(
+      JSON.stringify({ success: false, message: 'authentication failed' }),
+      { status: 401, headers: { 'content-type': 'application/json' } },
+    );
+  }
+}
+```
+
+## 미들웨어 Flag
+
+- skipMiddlewareUrlNormalize와 skipTrailingSlashRedirect가 있다.
+
+### skipTrailingSlashRedirect
+
+- 후행 슬래시에 관한 처리를 하는 flag가 있다.
+
+```
+# next.config.js
+module.exports = {
+  skipTrailingSlashRedirect: true,
+};
+
+```
+
+```
+# middleware.js
+const legacyPrefixes = ['/docs', '/blog'];
+
+export default async function middleware(req) {
+  const { pathname } = req.nextUrl;
+
+  if (legacyPrefixes.some((prefix) => pathname.startsWith(prefix))) {
+    return NextResponse.next();
+  }
+
+  // apply trailing slash handling
+  if (
+    !pathname.endsWith('/') &&
+    !pathname.match(/((?!\.well-known(?:\/.*)?)(?:[^/]+\/)*[^/]+\.\w+)/)
+  ) {
+    req.nextUrl.pathname += '/';
+    return NextResponse.redirect(req.nextUrl);
+  }
+}
+```
+
+### skipMiddlewareUrlNormalize
+
+- 직접 방문한 것과 클라이언트 전환 동일하게 처리한다.
+
+```
+# next.config.js
+module.exports = {
+  skipMiddlewareUrlNormalize: true,
+};
+
+```
+
+```
+# middleware.js
+export default async function middleware(req) {
+  const { pathname } = req.nextUrl;
+
+  // GET /_next/data/build-id/hello.json
+
+  console.log(pathname);
+  // with the flag this now /_next/data/build-id/hello.json
+  // without the flag this would be normalized to /hello
+}
+```
+
+# 프로젝트 조직과 파일 협력
+
+<div>
+  <img src='./img/ProjectFile.png' width='300'>
+</div>
+
+## 프로젝트 조직 특징
+
+### Private Folders
+
+- \_folderName으로 만든다
+- 개인용 작업 파일로 파일 생성시 route 되지는 않음
+- 라우팅 로직에서 UI 분리할때 용이
+- 내부 파일을 일관되게 구성할때 용이
+- 정렬과 그룹파일을 정리할때 용이
+- 잠재적인 이름 방지
+
+### Route Groups
+
+- (folderName)으로 관리한다.
+
+## 여러가지 프로젝트 관리 방법
+
+- app 밖에서 프로젝트 파일 관리
+<div>
+  <img src='./img/OuterProjectFile.png' width='300'>
+</div>
+- app 안에서 프로젝트 파일 관리
+<div>
+  <img src='./img/InnerProject.File.png' width='300'>
+</div>
+- 전역 파일은 app 밖 세부 파일은 app 내부 관리
+<div>
+  <img src='./img/MergeProjectFile.png' width='300'>
+</div>
+
+# 국제화
+
+- 브라우저에서 언어를 설정하는 것을 가져와서 사용하게 하면 브라우저 언어가 바뀔시 Next로 변환된다.
+
+```
+# middleware.js
+import { NextResponse } from 'next/server'
+
+let locales = ['en-US', 'nl-NL', 'nl']
+
+// Get the preferred locale, similar to above or using a library
+function getLocale(request) { ... }
+
+export function middleware(request) {
+  // Check if there is any supported locale in the pathname
+  const pathname = request.nextUrl.pathname
+  const pathnameIsMissingLocale = locales.every(
+    (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`
+  )
+
+  // Redirect if there is no locale
+  if (pathnameIsMissingLocale) {
+    const locale = getLocale(request)
+
+    // e.g. incoming request is /products
+    // The new URL is now /en-US/products
+    return NextResponse.redirect(
+      new URL(`/${locale}/${pathname}`, request.url)
+    )
+  }
+}
+
+export const config = {
+  matcher: [
+    // Skip all internal paths (_next)
+    '/((?!_next).*)',
+    // Optional: only run on root (/) URL
+    // '/'
+  ],
+}
+```

@@ -7,3 +7,4 @@
 - #3 23/05/27 Next.JS routing.md ~Route Handlers
 - #4 23/05/28 Next.JS routing.md ~Internationalization
 - #5 23/05/29 Next.JS rendering.md ~Edge and Node.js Runtimes
+- #6 23/05/30 Next.JS data_fetching.md ~Caching

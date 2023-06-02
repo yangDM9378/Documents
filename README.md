@@ -8,4 +8,5 @@
 - #4 23/05/28 Next.JS routing.md ~Internationalization
 - #5 23/05/29 Next.JS rendering.md ~Edge and Node.js Runtimes
 - #6 23/05/30 Next.JS data_fetching.md ~Caching
-- #7 23/06/01 Next.JS data_fetching.md ~ Revalidating
+- #7 23/06/01 Next.JS data_fetching.md ~Revalidating
+- #8 23/06/02 Next.JS styling.md ~Sass

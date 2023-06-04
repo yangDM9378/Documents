@@ -10,3 +10,5 @@
 - #6 23/05/30 Next.JS data_fetching.md ~Caching
 - #7 23/06/01 Next.JS data_fetching.md ~Revalidating
 - #8 23/06/02 Next.JS styling.md ~Sass
+- #9 23/06/04 Next.Js optimizations.md ~Images
+

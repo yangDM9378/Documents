@@ -12,3 +12,4 @@
 - #8 23/06/02 Next.JS styling.md ~Sass
 - #9 23/06/04 Next.Js optimizations.md ~Images
 - #10 23/06/05 Next.JS optimizations.md ~Scripts
+- #11 23/06/08 Next.JS optimizations.md ~Static Assets

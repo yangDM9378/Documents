@@ -13,3 +13,4 @@
 - #9 23/06/04 Next.Js optimizations.md ~Images
 - #10 23/06/05 Next.JS optimizations.md ~Scripts
 - #11 23/06/08 Next.JS optimizations.md ~Static Assets
+- #12 23/06/09 Next.JS optimizations.md ~Analytics

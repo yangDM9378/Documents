@@ -14,3 +14,4 @@
 - #10 23/06/05 Next.JS optimizations.md ~Scripts
 - #11 23/06/08 Next.JS optimizations.md ~Static Assets
 - #12 23/06/09 Next.JS optimizations.md ~Analytics
+- #13 23/06/14 Next.JS configuring.md ~Environment Variables

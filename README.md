@@ -1,7 +1,11 @@
 # Documents
-공식문서를 읽어가며 정리해가는 공부 노트입니다.
+
+공식문서/서적을 읽어가며 정리해가는 공부 노트입니다.
 
 ## Next.JS
+
+### <공식문서>
+
 - #1 23/05/24 Next.JS routing.md ~Pages&Layout
 - #2 23/05/25 Next.JS routing.md ~Error Handling
 - #3 23/05/27 Next.JS routing.md ~Route Handlers
@@ -15,3 +19,9 @@
 - #11 23/06/08 Next.JS optimizations.md ~Static Assets
 - #12 23/06/09 Next.JS optimizations.md ~Analytics
 - #13 23/06/14 Next.JS configuring.md ~Environment Variables
+
+## JavaScript
+
+### <모던 자바스크립트 DeepDive>
+
+- #1 23/07/10 JavaScript 01프로그래밍.md 1.프로그래밍

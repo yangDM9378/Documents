@@ -29,3 +29,4 @@
 - #3 23/07/11 JavaScript 04변수.md 4.변수
 - #4 23/07/11 JavaScript 05표현식과문.md 5.표현식과문
 - #5 23/07/12 JavaScript 06데이터타입.md 6.데이터타입
+- #6 23/07/12 JavaScript 07연산자.md 7.연산자

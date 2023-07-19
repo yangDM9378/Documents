@@ -37,3 +37,4 @@
 - #11 23/07/18 JavaScript 12함수.md 12.함수
 - #12 23/07/18 JavaScript 13스코프.md 13.스코프
 - #12 23/07/18 JavaScript 14전역변수의문제점.md 14.전역변수의문제점
+- #13 23/07/19 JavaScript 15let_const키워드와블록레벨스코프.md 15.let, const 키워드와 블록 레벨 스코프

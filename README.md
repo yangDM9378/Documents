@@ -42,3 +42,4 @@
 - #16 23/07/20 JavaScript 17생성자함수에의한객체생성.md 17.생성자 함수에 의한 객체 생성
 - #17 23/07/21 JavaScript 18함수와일급객체.md 18.함수와 일급 객체
 - #18 23/07/25 JavaScript 19프로토타입.md  19.프로토타입
+- #19 23/07/26 JavaScript 20StrictMode.md 20.strict mode

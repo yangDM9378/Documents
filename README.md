@@ -44,3 +44,4 @@
 - #18 23/07/25 JavaScript 19프로토타입.md  19.프로토타입
 - #19 23/07/26 JavaScript 20StrictMode.md 20.strict mode
 - #20 23/07/28 JavaScript 21빌드인객체.md 21.빌드인 객체
+- #21 23/08/01 JavaScript 22this.md 22. this

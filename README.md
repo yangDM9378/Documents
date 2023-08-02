@@ -45,3 +45,4 @@
 - #19 23/07/26 JavaScript 20StrictMode.md 20.strict mode
 - #20 23/07/28 JavaScript 21빌드인객체.md 21.빌드인 객체
 - #21 23/08/01 JavaScript 22this.md 22. this
+- #22 23/08/02 JavaScript 23실행컨텍스트.md 23. 실행컨텍스트

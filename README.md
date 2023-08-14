@@ -46,3 +46,4 @@
 - #20 23/07/28 JavaScript 21빌드인객체.md 21.빌드인 객체
 - #21 23/08/01 JavaScript 22this.md 22. this
 - #22 23/08/02 JavaScript 23실행컨텍스트.md 23. 실행컨텍스트
+- #23 23/08/14 JavaScript 24클로저.md 24.클로저

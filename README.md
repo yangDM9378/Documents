@@ -47,3 +47,4 @@
 - #21 23/08/01 JavaScript 22this.md 22. this
 - #22 23/08/02 JavaScript 23실행컨텍스트.md 23. 실행컨텍스트
 - #23 23/08/14 JavaScript 24클로저.md 24.클로저
+- #24 23/08/19 JavaScript 25클래스.md 25.클래스 ~ 25.7 프로퍼티

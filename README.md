@@ -51,3 +51,4 @@
 - #25 23/08/20 JavaScript 25클래스.md 25.8사아속에 의한 클래스 확장~25.클래스
 - #26 23/08/21 JavaScript 26ES6함수의추가.md 26.ES6함수의 추가 기능
 - #27 23/08/22 JavaScript 27배열.md 27.배열
+- #28 23/08/23 JavaScript 28number.md 28.Number

@@ -53,3 +53,4 @@
 - #27 23/08/22 JavaScript 27배열.md 27.배열
 - #28 23/08/23 JavaScript 28number.md 28.Number
 - #29 23/08/23 JavaScript 29math.md 29.Math
+- #30 23/08/24 JavaScript 30date.md 30.Date

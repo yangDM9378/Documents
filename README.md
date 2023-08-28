@@ -54,3 +54,4 @@
 - #28 23/08/23 JavaScript 28number.md 28.Number
 - #29 23/08/23 JavaScript 29math.md 29.Math
 - #30 23/08/24 JavaScript 30date.md 30.Date
+- #31 23/08/28 JavaScript 31정규표현식.md 31.RegExp
